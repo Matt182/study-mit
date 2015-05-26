@@ -239,11 +239,11 @@ class StandardRobot(Robot):
             self.position = x
             self.room.cleanTileAtPosition(self.position)
         else:
-            sself.setRobotDirection(random.randint(0,360))
+            self.setRobotDirection(random.randint(0,360))
 
 # === Problem 3
 
-def runSimulation(num_robots, speed, width, height, num_trials):
+def runSimulation(num_robots, speed, width, height, min_coverage):
     """
     Runs NUM_TRIALS trials of the simulation and returns the mean number of
     time-steps needed to clean the fraction MIN_COVERAGE of the room.
@@ -263,53 +263,86 @@ def runSimulation(num_robots, speed, width, height, num_trials):
     z =0
     robots = []
     room = RectangularRoom(width, height)
+    cover = 0
     for i in range(0,num_robots):
         robots.append(Robot(room, speed))
-    anim = ps6_visualize.RobotVisualization(num_robots,width,height)
-    while room.getNumCleanedTiles() < room.getNumTiles() or i < num_trials:
+    #anim = ps6_visualize.RobotVisualization(num_robots,width,height,0.01)
+    while room.getNumCleanedTiles() < room.getNumTiles() and cover < min_coverage:
         for j in robots:
             j.updatePositionAndClean()
         z += 1
-        anim.update(room, robots)
-    anim.done()
+        cover = 100*room.getNumCleanedTiles()/room.getNumTiles()
+        #anim.update(room, robots)
+    #anim.done()
+    return z
 
-runSimulation(2,1,25,25,25)
-# # === Problem 4
-# #
-# # 1) How long does it take to clean 80% of a 20x20 room with each of 1-10 robots?
-# #
-# # 2) How long does it take two robots to clean 80% of rooms with dimensions
-# #	 20x20, 25x16, 40x10, 50x8, 80x5, and 100x4?
-#
-# def showPlot1():
-#     """
-#     Produces a plot showing dependence of cleaning time on number of robots.
-#     """
-#     raise NotImplementedError
-#
-# def showPlot2():
+#runSimulation(2,1,25,25,6,25)
+ # === Problem 4
+ #
+ # 1) How long does it take to clean 80% of a 20x20 room with each of 1-10 robots?
+ #
+ # 2) How long does it take two robots to clean 80% of rooms with dimensions
+ #	 20x20, 25x16, 40x10, 50x8, 80x5, and 100x4?
+
+def showPlot1(num_robots,times):
+    """
+    Produces a plot showing dependence of cleaning time on number of robots.
+    """
+    y = []
+    x = []
+    for i in range(1,num_robots+1):
+        res = 0
+        x.append(i)
+        for j in range(0,times):
+            res += runSimulation(i,1,20,20,80)
+        y.append(res/times)
+    pylab.title('robotsss')
+    pylab.xlabel('robots')
+    pylab.ylabel('time')
+    pylab.plot(x,y)
+    pylab.show()
+
+showPlot1(10,30)
+
+
+# def showPlot2(hw):
 #     """
 #     Produces a plot showing dependence of cleaning time on room shape.
 #     """
-#     raise NotImplementedError
-#
-# # === Problem 5
-#
+#     x = []
+#     y = []
+#     for i in range(0,len(hw)):
+#         res = 0
+#         x.append(hw[i])
+#         for j in range(0,30):
+#             res += runSimulation(2,1,hw[i][0],hw[i][1],80)
+#         y.append(res/30)
+#     pylab.title('robotsss')
+#     pylab.xlabel('surface')
+#     pylab.ylabel('time')
+#     pylab.plot(x,y)
+#     pylab.show()
+# 
+# hw = [[20,20], [25,16], [40,10], [50,8], [80,5], [100,4]]
+# 
+# #showPlot2(hw)
+# # # === Problem 5
+# #
 # class RandomWalkRobot(Robot):
 #     """
 #     A RandomWalkRobot is a robot with the "random walk" movement strategy: it
 #     chooses a new direction at random after each time-step.
 #     """
 #     raise NotImplementedError
-#
-#
-# # === Problem 6
-#
-# # For the parameters tested below (cleaning 80% of a 20x20 square room),
-# # RandomWalkRobots take approximately twice as long to clean the same room as
-# # StandardRobots do.
-# def showPlot3():
-#     """
-#     Produces a plot comparing the two robot strategies.
-#     """
-#     raise NotImplementedError
+#  #
+#  #
+#  # # === Problem 6
+#  #
+#  # # For the parameters tested below (cleaning 80% of a 20x20 square room),
+#  # # RandomWalkRobots take approximately twice as long to clean the same room as
+#  # # StandardRobots do.
+#  # def showPlot3():
+#  #     """
+#  #     Produces a plot comparing the two robot strategies.
+#  #     """
+#  #     raise NotImplementedError
